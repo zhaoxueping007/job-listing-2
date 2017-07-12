@@ -1,16 +1,12 @@
 class JobsController < ApplicationController
   before_action :authenticate_user!, only: [:new, :create, :update, :edit, :destroy]
 
-  def job_params
-      params.require(:job).permit(:title, :description, :wage_upper_bound, :wage_lower_bound, :contact_email)
-  end
-  
   def show
     @job = Job.find(params[:id])
   end
 
   def index
-    @jobs = Job.all
+    @jobs = Job.where(:is_hidden => false).order("created_at DESC")
   end
 
   def new
@@ -25,12 +21,6 @@ class JobsController < ApplicationController
     else
       render :new
     end
-  end
-
-  private
-
-  def job_params
-    params.require(:job).permit(:title, :description)
   end
 
   def edit
@@ -52,6 +42,12 @@ class JobsController < ApplicationController
     @job.destroy
 
     redirect_to jobs_path
+  end
+
+  private
+
+  def job_params
+    params.require(:job).permit(:title, :description, :wage_upper_bound, :wage_lower_bound, :contact_email, :is_hidden)
   end
 
 end
